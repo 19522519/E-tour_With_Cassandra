@@ -1,0 +1,56 @@
+﻿CREATE KEYSPACE TourManagement WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+use TourManagement;
+
+create table User( Email text, Password text, Ho text, Ten text, SDT text, Primary key(Email));
+
+create table Tuyen( MaTuyen uuid, TenTuyen text, XuatPhat text, DiaDiem text, ThoiGianToChuc text, MaLoaiTuyen text, TenLoaiTuyen text, Primary key (MaTuyen));
+
+create table LoaiTuyen( MaLoaiTuyen text, TenLoaiTuyen text, LePhiHoanTra int, Primary key (MaLoaiTuyen));
+
+create table ChuyenDuLich(MaChuyen uuid, MaChuyenSearch text, MaTuyen uuid, TenTuyen text, ThoiGianKhoiHanh timestamp, PhuongTien text, SoLuongveMax int, GiaVe decimal, MaLoaiChuyen text , TenLoaiChuyen text, Primary key (MaChuyen));
+
+create table LoaiChuyen( MaLoaiChuyen text, TenLoaiChuyen text, TienHoanTra decimal, Primary key (MaLoaiChuyen));
+
+create table PhieuDatCho( MaPhieu uuid, MaChuyen uuid, Primary key (MaChuyen, MaPhieu));
+
+create table Ve( MaVe uuid, MaPhieu uuid, GiaVe decimal, MaDuKhach uuid, HoTen text, DiaChi text, SDT text, GioiTinh text, CMND_Passport text, TenLoaiKhach text, HanPassport timestamp, HanVisa timestamp, MaChuyen uuid, MaChuyenSearch text, TenLoaiTuyen text, TenLoaiChuyen text, LePhiHoanTra int, TienHoanTra decimal, Primary key ((MaPhieu, MaDuKhach), MaVe));
+
+create table DuKhach( MaDuKhach uuid, HoTen text, DiaChi text, SDT text, MaLoaiKhach text, GioiTinh text, CMND_Passport text, HanPassport timestamp, HanVisa timestamp, Primary key (MaDuKhach));
+
+create table LoaiKhach( MaLoaiKhach text, TenLoaiKhach text, Primary key (MaLoaiKhach));
+
+CREATE CUSTOM INDEX  fn_TenTuyen ON Tuyen (TenTuyen) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS={'mode':'CONTAINS'};
+CREATE CUSTOM INDEX  fn_MaChuyen ON ChuyenDuLich (MaChuyenSearch) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS={'mode':'CONTAINS'};
+CREATE CUSTOM INDEX  fn_MaChuyen_Ve ON Ve (MaChuyenSearch) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS={'mode':'CONTAINS'};
+
+
+--Password: 123
+Insert into TourManagement.User (Email, Password, Ho, Ten, SDT)
+values('19522003@gm.uit.edu.vn','ICy5YqxZB1uWSwcVLSNLcA==','Vo','Phat','090432');
+Insert into TourManagement.User (Email, Password, Ho, Ten, SDT)
+values('19522144@gm.uit.edu.vn','ICy5YqxZB1uWSwcVLSNLcA==','Nguyen','Sua','090432');
+Insert into TourManagement.User (Email, Password, Ho, Ten, SDT)
+values('19522335@gm.uit.edu.vn','ICy5YqxZB1uWSwcVLSNLcA==','Hoang','Tien','090432');
+Insert into TourManagement.User (Email, Password, Ho, Ten, SDT)
+values('19522519@gm.uit.edu.vn','ICy5YqxZB1uWSwcVLSNLcA==','Vo','Viet','090432');
+
+Insert into TourManagement.LoaiKhach(MaLoaiKhach, TenLoaiKhach)
+values ('CUS001', 'Domestic');
+Insert into TourManagement.LoaiKhach(MaLoaiKhach, TenLoaiKhach)
+values ('CUS002', 'Foreign');
+
+Insert into TourManagement.LoaiTuyen(MaLoaituyen, TenLoaiTuyen, LePhiHoanTra)
+values ('ROUTE01', 'National', 100000);
+Insert into TourManagement.LoaiTuyen(MaLoaiTuyen, TenLoaiTuyen, LePhiHoanTra)
+values ('ROUTE02', 'International', 1150000);
+
+Insert into TourManagement.Loaichuyen(MaLoaiChuyen, TenLoaiChuyen, TienHoanTra)
+values ('TOUR01', 'Regular', 1);
+Insert into TourManagement.LoaiChuyen(MaLoaiChuyen, TenLoaiChuyen, TienHoanTra)
+values ('TOUR02', 'Promotional', 0.8); 
+
+Insert into Tuyen (MaTuyen, TenTuyen, XuatPhat, DiaDiem, ThoiGianToChuc, MaLoaiTuyen, TenLoaiTuyen)
+values (6c7f4f3e-7512-48a0-a196-f4178d63cd1a, 'Tuyen An Giang - TPHCM', 'An Giang', 'TP HCM', '3 Day 4 Night', 'ROUTE01', 'National');
+
+Insert into ChuyenDuLich(MaChuyen, MaChuyenSearch, MaTuyen, TenTuyen, ThoiGianKhoiHanh , PhuongTien, SoLuongveMax, GiaVe, MaLoaiChuyen, TenLoaiChuyen)
+values (6c7f4f3e-7512-48a0-a196-f4478d63cd1a, '6c7f4f3e-7512-48a0-a196-f4478d63cd1a', 6c7f4f3e-7512-48a0-a196-f4178d63cd1a, 'Tuyen An Giang - TPHCM', '2022-1-9', 'Xe khach', 50, 160000, 'TOUR01', 'Regular');
